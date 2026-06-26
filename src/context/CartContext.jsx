@@ -13,7 +13,13 @@ export function CartProvider({ children }) {
     localStorage.setItem(CART_KEY, JSON.stringify(cart));
   }, [cart]);
 
-  const getFinalPrice = (product) => product.precioOferta || product.precio;
+  const getFinalPrice = (product) => {
+  if (product.cantidad >= 3 && product.precioMayor) {
+    return product.precioMayor;
+  }
+
+  return product.precioOferta || product.precio;
+};
 
   const addToCart = (product) => {
     const stock = Number(product.stock) || 0;

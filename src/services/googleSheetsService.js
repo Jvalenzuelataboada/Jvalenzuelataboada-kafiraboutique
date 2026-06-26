@@ -1,6 +1,8 @@
 const SHEET_URL =
   "https://docs.google.com/spreadsheets/d/e/2PACX-1vTy0ea_J0iH9Tlclz8Vz02kegSo3w97j0TfkhIuCfiy2FHb55zS9KS_Oang5JojEdt6MTJQPJJmfvz8/pub?gid=0&single=true&output=csv";
 
+let productsCache = null;
+
 function parseCSV(text) {
   const rows = [];
   let current = "";
@@ -49,13 +51,26 @@ export function createProductSlug(product) {
 }
 
 export async function getProducts() {
-  const response = await fetch(SHEET_URL);
-  const text = await response.text();
+  if (productsCache) {
+    return productsCache;
+  }
 
+  const response = await fetch(SHEET_URL);
+
+  if (!response.ok) {
+    throw new Error("No se pudo cargar Google Sheets");
+  }
+
+  const text = await response.text();
   const rows = parseCSV(text);
+
+  if (!rows.length) {
+    return [];
+  }
+
   const headers = rows[0].map((h) => h.trim());
 
-  return rows
+  productsCache = rows
     .slice(1)
     .map((row) => {
       const product = headers.reduce((acc, header, index) => {
@@ -67,9 +82,8 @@ export async function getProducts() {
         ...product,
         item: product.item,
         precio: Number(product.precio) || 0,
-        precioOferta: product.precioOferta
-          ? Number(product.precioOferta)
-          : "",
+        precioOferta: product.precioOferta ? Number(product.precioOferta) : "",
+        precioMayor: product.precioMayor ? Number(product.precioMayor) : "",
         stock: Number(product.stock) || 0,
         tallas: product.tallas
           ? product.tallas.split(",").map((t) => t.trim())
@@ -79,5 +93,7 @@ export async function getProducts() {
           : [],
       };
     })
-    .filter((product) => product.estado?.toUpperCase() === "ACTIVO");
+    .filter((product) => product.estado?.trim().toUpperCase() === "ACTIVO");
+
+  return productsCache;
 }

@@ -113,6 +113,22 @@ export default function Footer() {
 
           </div>
 
+          <div className="mt-6">
+            <h3 className="mb-3 text-lg font-black text-pink-300">
+              Paga con Yape
+            </h3>
+
+            <img
+              src="/images/pagos/yape-qr.jpeg"
+              alt="QR Yape Kafira Boutique"
+              className="w-24 rounded-xl bg-white p-1 shadow-lg"
+            />
+
+            <p className="mt-2 text-xs text-white/70">
+              Escanea el QR y envía tu comprobante por WhatsApp.
+            </p>
+          </div>
+
           <p className="mt-6 text-sm text-white/70">
             {company.whatsappDisplay}
           </p>

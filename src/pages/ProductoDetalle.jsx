@@ -36,7 +36,9 @@ export default function ProductoDetalle() {
   if (loading) {
     return (
       <main className="mx-auto max-w-7xl px-5 py-16">
-        <p className="font-bold text-gray-600">Cargando producto...</p>
+        <div className="rounded-3xl bg-white p-8 text-center shadow-lg">
+          <p className="font-bold text-gray-600">Cargando producto...</p>
+        </div>
       </main>
     );
   }
@@ -141,6 +143,18 @@ Producto: ${product.nombre}`;
             )}
           </div>
 
+          {product.precioMayor ? (
+            <div className="mt-5 rounded-3xl bg-green-50 p-5">
+              <p className="text-sm font-black uppercase tracking-[0.2em] text-green-600">
+                Precio por mayor a partir de 3 unidades
+              </p>
+
+              <p className="mt-2 text-4xl font-black text-green-600">
+                S/ {Number(product.precioMayor).toFixed(2)}
+              </p>
+            </div>
+          ) : null}
+
           <p className="mt-6 text-lg text-gray-600">
             {product.descripcionLarga}
           </p>
@@ -203,6 +217,29 @@ Producto: ${product.nombre}`;
             >
               {isOutOfStock ? "Agotado" : "Agregar al pedido"}
             </button>
+            <div className="mt-5 rounded-2xl border border-purple-100 bg-purple-50 p-4">
+              <h3 className="text-center text-xl font-black text-purple-700">
+                💜 Paga con Yape
+              </h3>
+
+              <img
+                src="/images/pagos/yape-qr.jpeg"
+                alt="QR Yape"
+                className="mx-auto mt-3 w-32 rounded-xl shadow-md"
+              />
+
+              <p className="mt-4 text-center text-sm text-gray-600">
+                Escanea el QR y envía el comprobante por WhatsApp para confirmar tu pedido.
+              </p>
+            </div>
+
+            <div className="mt-4 space-y-2 text-sm text-gray-700">
+              <p>✔ Pago seguro mediante Yape.</p>
+              <p>✔ Envía tu comprobante por WhatsApp.</p>
+              <p>✔ Tu pedido será confirmado rápidamente.</p>
+            </div>
+
+
 
             <a
               href={createWhatsAppLink(whatsappMessage)}

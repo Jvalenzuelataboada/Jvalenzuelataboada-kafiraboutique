@@ -3,18 +3,35 @@ import { useCart } from "../context/CartContext";
 import { createWhatsAppLink } from "../utils/whatsapp";
 
 export default function Pedido() {
-  const { cart, addToCart, decreaseQuantity, removeFromCart, clearCart, total } = useCart();
+  const {
+    cart,
+    addToCart,
+    decreaseQuantity,
+    removeFromCart,
+    clearCart,
+    total,
+  } = useCart();
 
-  const getFinalPrice = (item) => item.precioOferta || item.precio;
+  const getFinalPrice = (item) => {
+    if (item.cantidad >= 3 && item.precioMayor) {
+      return item.precioMayor;
+    }
+
+    return item.precioOferta || item.precio;
+  };
 
   const message = cart
     .map((item, index) => {
       const price = getFinalPrice(item);
+      const isWholesale = item.cantidad >= 3 && item.precioMayor;
 
       return `${index + 1}.
 Item: ${item.item}
 ${item.nombre}
+
 Cantidad: ${item.cantidad}
+Precio aplicado: S/ ${Number(price).toFixed(2)}
+${isWholesale ? "Precio por mayor aplicado" : "Precio unidad aplicado"}
 Subtotal: S/ ${(price * item.cantidad).toFixed(2)}`;
     })
     .join("\n\n");
@@ -68,6 +85,7 @@ Total aproximado: S/ ${total.toFixed(2)}`;
         <div className="space-y-5">
           {cart.map((item) => {
             const price = getFinalPrice(item);
+            const isWholesale = item.cantidad >= 3 && item.precioMayor;
 
             return (
               <article
@@ -87,26 +105,40 @@ Total aproximado: S/ ${total.toFixed(2)}`;
 
                   <h2 className="mt-2 text-2xl font-black">{item.nombre}</h2>
 
-                  <div className="mt-3 grid gap-1 text-sm text-gray-600">
-                    <div className="mt-3 flex items-center gap-3">
-                      <button
-                        onClick={() => decreaseQuantity(item.item)}
-                        className="flex h-9 w-9 items-center justify-center rounded-full bg-pink-100 font-black text-pink-500 hover:bg-pink-200"
-                      >
-                        -
-                      </button>
+                  <div className="mt-4 flex items-center gap-3">
+                    <button
+                      onClick={() => decreaseQuantity(item.item)}
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-pink-100 font-black text-pink-500 hover:bg-pink-200"
+                    >
+                      -
+                    </button>
 
-                      <span className="font-black">{item.cantidad}</span>
+                    <span className="font-black">{item.cantidad}</span>
 
-                      <button
-                        onClick={() => addToCart(item)}
-                        disabled={item.cantidad >= Number(item.stock)}
-                        className="flex h-9 w-9 items-center justify-center rounded-full bg-pink-100 font-black text-pink-500 hover:bg-pink-200 disabled:cursor-not-allowed disabled:opacity-40"
-                      >
-                        +
-                      </button>
-                    </div>
-                    <p>Precio: S/ {Number(price).toFixed(2)}</p>
+                    <button
+                      onClick={() => addToCart(item)}
+                      disabled={item.cantidad >= Number(item.stock)}
+                      className="flex h-9 w-9 items-center justify-center rounded-full bg-pink-100 font-black text-pink-500 hover:bg-pink-200 disabled:cursor-not-allowed disabled:opacity-40"
+                    >
+                      +
+                    </button>
+                  </div>
+
+                  <div className="mt-4 grid gap-1 text-sm text-gray-600">
+                    <p>
+                      Precio aplicado:{" "}
+                      <strong>S/ {Number(price).toFixed(2)}</strong>
+                    </p>
+
+                    {isWholesale ? (
+                      <p className="font-bold text-green-600">
+                        Precio por mayor aplicado
+                      </p>
+                    ) : (
+                      <p className="font-bold text-pink-500">
+                        Precio unidad aplicado
+                      </p>
+                    )}
                   </div>
 
                   <p className="mt-3 text-xl font-black text-[#302747]">
@@ -132,6 +164,22 @@ Total aproximado: S/ ${total.toFixed(2)}`;
             <p className="text-sm text-gray-600">Total aproximado</p>
             <p className="mt-2 text-4xl font-black text-[#302747]">
               S/ {total.toFixed(2)}
+            </p>
+          </div>
+
+          <div className="mt-6 rounded-3xl bg-purple-50 p-4 text-center">
+            <h3 className="text-xl font-black text-purple-700">
+              Paga con Yape
+            </h3>
+
+            <img
+              src="/images/pagos/yape-qr.jpeg"
+              alt="QR Yape Kafira Boutique"
+              className="mx-auto mt-4 w-64 rounded-2xl shadow-lg"
+            />
+
+            <p className="mt-3 text-sm text-gray-600">
+              Escanea el QR y envía tu comprobante por WhatsApp.
             </p>
           </div>
 
